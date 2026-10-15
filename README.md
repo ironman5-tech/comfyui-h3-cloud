@@ -29,7 +29,7 @@
 打开实例的终端，执行：
 
 ```bash
-git clone https://github.com/<你的GitHub用户名>/comfyui-h3-cloud.git
+git clone https://github.com/ironman5-tech/comfyui-h3-cloud.git
 cd comfyui-h3-cloud
 bash setup_cloud.sh
 ```
