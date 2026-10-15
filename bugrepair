@@ -1,0 +1,31 @@
+原因查到了：问题出在平台用的 pip 下载源，不是你的操作，也不是脚本写错了。
+
+## 原因
+
+这台服务器的 pip 默认从清华镜像站（pypi.tuna.tsinghua.edu.cn）下载 Python 包。ComfyUI 0.38.2 需要一个叫 `comfyui-workflow-templates-media-assets-02` 的包，版本是 0.1.8。我查了官方的 PyPI：
+
+- 官方 PyPI 上有这个版本，10 月 2 日发布，支持 Python 3.9 及以上，你的 Python 3.10 完全可以用；
+- 清华镜像上这个包只有 0.1.0 和 0.1.1 两个很旧的版本，新版本没有同步过来。
+
+所以 pip 在镜像上找不到 0.1.8，就报错了。报错里提到「需要 Python 3.12」，说的是镜像上那两个旧版本，和你的环境无关。
+
+## 影响
+
+这个包本身只是 ComfyUI 自带的示例工作流模板，跑你的工作流用不到它。麻烦的是：pip 只要有一个包装不上，就会放弃整个 requirements.txt。ComfyUI 0.38.2 需要的其他包（比如新版前端界面、comfy-kitchen）可能也没有更新，这会影响工作流能不能正常打开和运行。
+
+## 怎么处理
+
+1. **现在不要打断脚本**，让它继续往下跑，装插件、下载模型。
+2. 脚本全部跑完后，在终端里粘贴这一行。它的作用是这一次改从官方 PyPI 下载，把 ComfyUI 的依赖补装上：
+
+```bash
+python -m pip install -r /root/ComfyUI/requirements.txt -i https://pypi.org/simple
+```
+
+3. 看到最后一行是 `Successfully installed ...`，或者全是 `Requirement already satisfied`，就说明装好了。然后在平台上重启 ComfyUI。
+
+如果这一步很慢或者连不上官方 PyPI，把输出截图发给我。
+
+## 以后可以顺手改进脚本（等你决定）
+
+可以让脚本在镜像装不上时，自动改从官方 PyPI 再装一次。这样以后换新机器部署，就不会再卡在这里。要不要改，你说了我再动。
